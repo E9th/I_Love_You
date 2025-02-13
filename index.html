@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ให้อัยณีย์แต่เพียงผู้เดียว</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <!-- Clippy.js CSS (จากโค้ดก่อนหน้า หากมีใช้งาน) -->
+  <link rel="stylesheet" href="https://unpkg.com/clippyjs@1.0.0/clippy.min.css">
+  <!-- Custom CSS -->
+  <style>
+    /* พื้นหลังเว็บไซต์ สีโรแมนติก */
+    body {
+      background-color: #ffe6e6;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    /* สไตล์ส่วน header */
+    .custom-header {
+      background: linear-gradient(to right, #ff4d4d, #ff99cc);
+      color: #fff;
+      padding: 30px 0;
+      text-align: center;
+    }
+    .custom-header h1 {
+      /* ขนาดฟอนต์สำหรับเดสก์ท็อป */
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+    /* ปรับให้ข้อความและปุ่มอยู่ในบรรทัดเดียวกัน */
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    /* สไตล์ส่วน navbar */
+    .navbar {
+      background-color: #fff0f5;
+    }
+    /* ให้ข้อความใน navbar แบรนด์สามารถตัดบรรทัดได้ */
+    .navbar-brand {
+      white-space: normal;
+    }
+    /* สไตล์ส่วน hero */
+    .hero {
+      background-image: url('images/hero.png');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      height: 60vh;
+      color: #fff;
+      overflow: hidden;
+    }
+    /* Overlay สำหรับส่วน hero */
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 0, 102, 0.5);
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding-top: 10%;
+      text-align: center;
+      opacity: 0;
+      animation: fadeIn 1.5s forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    .col-md-6 {
+      padding-top: 2.5%;
+    }
+    .figure-caption {
+      padding-top: 2.5%;
+    }
+    .hero-content h2 {
+      font-size: 3rem;
+      font-weight: bold;
+      transition: font-size 0.3s ease;
+    }
+    .hero-content p {
+      font-size: 1.25rem;
+      transition: font-size 0.3s ease;
+    }
+    /* สไตล์ปุ่ม */
+    .btn {
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+    }
+    /* สไตล์ navbar links */
+    .nav-link {
+      transition: color 0.3s ease;
+    }
+    .nav-link:hover {
+      color: #ff4d4d;
+    }
+    /* สไตล์ส่วนข้อความรักใน Cards */
+    .card {
+      border: none;
+      background-color: #fff;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card img {
+      height: 200px;
+      object-fit: cover;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    .card .card-body {
+      background: #fff0f5;
+    }
+    /* เอฟเฟค hover ให้กับภาพในแกลเลอรี */
+    #gallery img {
+      transition: transform 0.3s ease;
+    }
+    #gallery img:hover {
+      transform: scale(1.05);
+    }
+    /* สไตล์ส่วน footer */
+    .custom-footer {
+      background: #ff99cc;
+      color: #fff;
+      padding: 15px 0;
+      text-align: center;
+    }
+    /* Custom style สำหรับ Answer Key Modal */
+    .modal-content.answer-key {
+      background: linear-gradient(to right, #ffcccc, #ffe6e6);
+    }
+    /* Responsive Design adjustments */
+    @media (max-width: 768px) {
+      .hero {
+        min-height: 50vh; /* เพิ่มความสูงขั้นต่ำ */
+        height: auto;     /* หรือปรับให้ auto เพื่อให้เนื้อหาขยายได้ */
+      }
+      .hero-content {
+        padding: 20%;
+      }
+      .hero-content h2 {
+        font-size: 2rem;
+      }
+      .hero-content p {
+        font-size: 1rem;
+      }
+      .custom-header {
+        padding: 20px 0;
+      }
+      .navbar-brand {
+        font-size: 1.2rem;
+      }
+      /* ลดขนาดหัวข้อใน header */
+      .custom-header h1 {
+        font-size: 2rem;
+      }
+    }
+    /* ปรับความสูงของรูปใน Card และขนาด Modal บนอุปกรณ์เล็ก */
+    @media (max-width: 576px) {
+      .card img {
+        height: 150px;
+      }
+      .modal-dialog {
+        max-width: 95%;
+        margin: 1.75rem auto;
+      }
+    }
+
+    /* ================== Heart Animation Effects ================== */
+    .heart {
+      position: absolute;
+      z-index: 99999; /* สูงกว่า .hero */
+      pointer-events: none;
+      color: #ff4d4d;
+      font-size: 24px;
+      animation: floatUp 2s ease-out forwards;
+}
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(1.5);
+      }
+    }
+    /* =========================================================== */
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="custom-header">
+    <div class="container text-center">
+      <h1>รักเธอนะ</h1>
+      <div class="header-content justify-content-center">
+        <p class="mb-0">ของขวัญวันวาเลนไทน์จ้า ลองเปิดดู</p>
+        <button id="btnPlaySong" class="btn btn-light">
+          <i class="bi bi-play-fill"></i> เปิดเล้ยย♥!
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="#">ของขวัญจากอัยมานผู้หล่อเท่ห์แด่วันแห่งความรัก</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+              aria-controls="navbarNav" aria-expanded="false" aria-label="สลับการนำทาง">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">หน้าแรก</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#love-messages">ข้อความรัก</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#our-story">เรื่องราวของเรา</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#gallery">แกลเลอรี</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content container">
+      <h2>รักแท้ไม่มีวันจาง</h2>
+      <p>วันแห่งความรัก ฉันมีให้เธอทุกวัน</p>
+      <a href="#love-messages" class="btn btn-danger btn-lg mt-3">
+        <i class="bi bi-heart-fill"></i> อ่านข้อความรัก
+      </a>
+    </div>
+  </section>
+
+  <!-- Love Messages Section -->
+  <section id="love-messages" class="my-5">
+    <div class="container">
+      <h2 class="text-center mb-4">ข้อความรักสำหรับเธอ</h2>
+      <div class="row row-cols-1 row-cols-md-2 g-4">
+        <!-- Card 1 -->
+        <div class="col">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">ข้อความที่ 1</h5>
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <img src="images/card1.png" alt="คำบรรยายรูปที่ 1" class="img-fluid rounded">
+                </div>
+                <div class="col">
+                  <p class="card-text mb-0">
+                    "คิดถึงตอนไปเที่ยวท้องฟ้าจำลองด้วยกันจัง ไว้ไปกันอีกนะ"
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="col">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">ข้อความที่ 2</h5>
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <img src="images/card2.png" alt="คำบรรยายรูปที่ 2" class="img-fluid rounded">
+                </div>
+                <div class="col">
+                  <p class="card-text mb-0">
+                    "คาเฟ่ห์ครั้งแรกกับครอบครัว ที่ร้านส่งพัสดุ♥ สนุกดีนะ"
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="col">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">ข้อความที่ 3</h5>
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <img src="images/card3.png" alt="คำบรรยายรูปที่ 3" class="img-fluid rounded">
+                </div>
+                <div class="col">
+                  <p class="card-text mb-0">
+                    "ปีนี้กลับสกลพร้อมกล้องฟิล์ม โชคดีมาก ได้รูปสวยๆกลับมาเยอะเลย"
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="col">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">ข้อความที่ 4</h5>
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <img src="images/card4.png" alt="คำบรรยายรูปที่ 4" class="img-fluid rounded">
+                </div>
+                <div class="col">
+                  <p class="card-text mb-0">
+                    "เราชอบดำน้ำมากก แต่ถ้าไม่มีเธอก็คงไม่อยากดำ อยากไปกับเธออีกจัง"
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Story Section -->
+  <section id="our-story" class="my-5">
+    <div class="container">
+      <h2 class="text-center mb-4">เรื่องราวของเรา</h2>
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <img src="images/our-story.png" class="img-fluid rounded" alt="เรื่องราวของเรา">
+        </div>
+        <div class="col-md-6">
+          <p>
+            ไม่รู้ว่านานแค่ไหนที่เราสองคนเลิกนับวันครบรอบกัน นั่นแปลว่าเราสองคนอยู่ด้วยกันมานานมากๆจนวันครบรอบไม่สำคัญเท่าการอยู่ด้วยกันแล้ว เรามีความสุขมากเลย
+          </p>
+          <p>
+            ตั้งแต่วันแรกที่รู้จักกัน จนถึงทุกวันนี้ เรามีความสุขมากที่ได้ใช้ชีวิตร่วมกับเธอนะ อยากไปเที่ยวด้วยกัน กินอาหารอร่อยๆด้วยกัน ดูยูทูปด้วยกัน ดูคัลเลน ดูเทพลีลา ดูเสือร้องไห้ด้วยกัน
+          </p>
+          <p>
+            และสักวันก็คงจะมีเบบี๋ด้วยกัน แล้วไปเที่ยวกันแบบครอบครัว เราขอให้ความสุขนี้อยู่ตลอดไป จนถึงวันสุดท้ายของชีวิตเลยนะ รักเธอนะ
+          </p>
+          <p>
+            ♥ หวังว่าจะชอบของขวัญที่เราทำให้นะ ♥
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Section -->
+  <section id="gallery" class="my-5">
+    <div class="container">
+      <h2 class="text-center mb-4">แกลเลอรีภาพความรัก</h2>
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <figure class="figure text-center">
+            <img src="images/gallery-1.png" class="img-fluid rounded" alt="Gallery 1">
+            <figcaption class="figure-caption">อยากไปเที่ยวอิต่องอีกจัง</figcaption>
+          </figure>
+        </div>
+        <div class="col-6 col-md-3">
+          <figure class="figure text-center">
+            <img src="images/gallery-2.png" class="img-fluid rounded" alt="Gallery 2">
+            <figcaption class="figure-caption">ถึงฝนจะตกแต่ก็มีความสุขนะ</figcaption>
+          </figure>
+        </div>
+        <div class="col-6 col-md-3">
+          <figure class="figure text-center">
+            <img src="images/gallery-3.png" class="img-fluid rounded" alt="Gallery 3">
+            <figcaption class="figure-caption">กว่าจะเดินมาถึงถ้ำนี้ได้ เกือบหัวทิ่มเลย</figcaption>
+          </figure>
+        </div>
+        <div class="col-6 col-md-3">
+          <figure class="figure text-center">
+            <img src="images/gallery-4.png" class="img-fluid rounded" alt="Gallery 4">
+            <figcaption class="figure-caption">ขายของใน Tiktok ก็สนุกดีนะ</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Love Quiz Section -->
+  <section id="love-quiz" class="my-5">
+    <div class="container">
+      <h2 class="text-center mb-4">Love Quiz: คุณรู้จักอัยมานดีแค่ไหน?</h2>
+      <form id="quizForm">
+        <div id="quizQuestions"></div>
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-success">ส่งคำตอบ♥</button>
+        </div>
+      </form>
+      <div id="quizResult" class="mt-4 text-center"></div>
+      <!-- ปุ่มสำหรับเปิดเฉลยคำตอบ -->
+      <div class="text-center mt-3">
+        <button id="btnShowAnswerKey" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#answerKeyModal">
+          ดูเฉลยคำตอบ
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="custom-footer">
+    <div class="container">
+      <p>&copy; 2025 ด้วยรักจากใจของอัยมาน</p>
+    </div>
+  </footer>
+
+  <!-- Modal สำหรับเพลง -->
+  <div class="modal fade" id="songModal" tabindex="-1" aria-labelledby="songModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="songModalLabel">รักแสบ...โมชิกัด</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+        </div>
+        <div class="modal-body">
+          <!-- เครื่องเล่นเพลง -->
+          <audio id="songAudio" controls class="w-100 mb-3">
+            <source src="audio/song.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+          <!-- เนื้อเพลง -->
+          <div style="white-space: pre-wrap; font-family: monospace;">
+[Verse 1]
+ยังจำวันแรกที่เราเจอกันได้ไหม
+วันที่ยี่สิบสาม ที่เราเริ่มคบกันอย่างไม่รู้ตัว
+เวลาเดินไปเร็ว จนตอนนี้ถึงวันที่หก
+เราได้ก้าวเข้าสู่ชีวิตคู่ด้วยกัน
+
+[Chorus]
+อายนีจ๋า รักเราไม่ต้องเว่อวัง
+กินข้าว ดูทีวี แค่มีเธอก็เพียงพอ
+แม้บางครั้ง โมชิก็แอบกัดเท้า
+แต่เราก็หัวเราะออกมา อายนีจ๋า
+
+[Verse 2]
+หลังเลิกงานกลับมาที่บ้าน
+เรานั่งคุยกัน ดูคันเลนกับพี่จอง
+โมชิเดินเข้ามาแล้วเริ่มกัด
+กัดฉัน กัดอายนี ทำให้บรรยากาศบ้านเรา
+มีทั้งเสียงหัวเราะกับความแสบเท้า
+
+[Pre-Chorus]
+อายนีจ๋า เราไม่ได้พูดจาหวานกันเลย
+แค่บอกกันแบบตรง ๆ ว่า “รักเธอนะ”
+ทุกวันที่ผ่านไป ทั้งดีและแสบเท้า
+ก็เป็นส่วนหนึ่งของชีวิตเราที่มีความสุข
+
+[Chorus]
+อายนีจ๋า รักเราแบบนี้ก็พอแล้ว
+จากวันที่ยี่สิบสาม ที่เริ่มคบ จนถึงวันที่หก ที่เราแต่งงาน
+แม้โมชิจะแสบกัดเท้าเป็นประจำ
+ก็แค่ทำให้วันธรรมดาเรา มีสีสันและเสียงหัวเราะ
+
+[Bridge]
+ไม่ต้องหรูหรา แค่มีเธอและโมชิ
+ทุกเช้า ทุกเย็น ก็เป็นความสุขที่เรียบง่าย
+รักที่แท้จริงคือการอยู่ด้วยกันในทุกวัน
+ทั้งยามดีและยามแสบเท้า ก็ยังคงเดินไปด้วยกัน
+
+[Outro]
+อายนี รักเราไม่ต้องเวอร์วัง
+แค่เราอยู่ด้วยกัน ก็เพียงพอสำหรับชีวิตนี้
+แม้โมชิจะแสบกัดเท้าบ้างในทุกวัน
+แต่หัวใจเรายังคงอบอุ่น
+และเต็มไปด้วยรัก อายนีจ๋า
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal สำหรับเฉลย Quiz -->
+  <div class="modal fade" id="answerKeyModal" tabindex="-1" aria-labelledby="answerKeyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content answer-key">
+        <div class="modal-header">
+          <h5 class="modal-title" id="answerKeyModalLabel">เฉลยคำตอบ Love Quiz</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+        </div>
+        <div class="modal-body">
+          <div class="list-group">
+            <div class="list-group-item">
+              <strong>1. อาหารที่เอิร์ธชอบที่สุดคืออะไร?</strong>
+              <p class="mb-0">เฉลย: ถูกทุกอย่าง</p>
+            </div>
+            <div class="list-group-item">
+              <strong>2. สถานที่ท่องเที่ยวที่เอิร์ธอยากไปที่สุดคือที่ไหน?</strong>
+              <p class="mb-0">เฉลย: อยู่บ้าน</p>
+            </div>
+            <div class="list-group-item">
+              <strong>3. สีที่เอิร์ธชอบที่สุดคืออะไร?</strong>
+              <p class="mb-0">เฉลย: ทุกสี บอกแล้วไม่ชอบสีแดง</p>
+            </div>
+            <div class="list-group-item">
+              <strong>4. งานอดิเรกที่เอิร์ธชอบคืออะไร?</strong>
+              <p class="mb-0">เฉลย: ไม่มีที่ชอบเป็นพิเศษ</p>
+            </div>
+            <div class="list-group-item">
+              <strong>5. เพลงประเภทที่เอิร์ธชอบฟังมากที่สุดคืออะไร?</strong>
+              <p class="mb-0">เฉลย: ไม่ฟังเพลง</p>
+            </div>
+            <div class="list-group-item">
+              <strong>6. สัตว์เลี้ยงที่เอิร์ธชอบมากที่สุดคืออะไร?</strong>
+              <p class="mb-0">เฉลย: สุนัข</p>
+            </div>
+            <div class="list-group-item">
+              <strong>7. เวลาว่างเอิร์ธชอบทำอะไร?</strong>
+              <p class="mb-0">เฉลย: อ่านการ์ตูน</p>
+            </div>
+            <div class="list-group-item">
+              <strong>8. ฤดูกาลที่เอิร์ธชอบที่สุดคือ?</strong>
+              <p class="mb-0">เฉลย: ฤดูหนาว</p>
+            </div>
+            <div class="list-group-item">
+              <strong>9. เครื่องดื่มที่เอิร์ธชอบคืออะไร?</strong>
+              <p class="mb-0">เฉลย: น้ำอัดลม</p>
+            </div>
+            <div class="list-group-item">
+              <strong>10. คาเฟ่ที่เอิร์ธชอบไปบ่อยคือร้านไหน?</strong>
+              <p class="mb-0">เฉลย: ทุกที่</p>
+            </div>
+            <div class="list-group-item">
+              <strong>11. หนังที่เอิร์ธชื่นชอบมากที่สุดคืออะไร?</strong>
+              <p class="mb-0">เฉลย: สยองขวัญ</p>
+            </div>
+            <div class="list-group-item">
+              <strong>12. วันเกิดของเอิร์ธคือวันไหน?</strong>
+              <p class="mb-0">เฉลย: 20 เมษายน</p>
+            </div>
+            <div class="list-group-item">
+              <strong>13. ขนมหวานที่เอิร์ธชอบคืออะไร?</strong>
+              <p class="mb-0">เฉลย: ไอศกรีม</p>
+            </div>
+            <div class="list-group-item">
+              <strong>14. นักกีฬาในฝันของเอิร์ธคือใคร?</strong>
+              <p class="mb-0">เฉลย: ไม่ดูบอล</p>
+            </div>
+            <div class="list-group-item">
+              <strong>15. หนังสือที่เอิร์ธชอบอ่านคือประเภทใด?</strong>
+              <p class="mb-0">เฉลย: หนังสือเกี่ยวกับวิทยาศาสตร์</p>
+            </div>
+            <div class="list-group-item">
+              <strong>16. ที่พักที่เอิร์ธชอบคือแบบไหน?</strong>
+              <p class="mb-0">เฉลย: โรงแรมหรู</p>
+            </div>
+            <div class="list-group-item">
+              <strong>17. ดอกไม้ที่เอิร์ธชอบมากที่สุดคืออะไร?</strong>
+              <p class="mb-0">เฉลย: กุหลาบ</p>
+            </div>
+            <div class="list-group-item">
+              <strong>18. กิจกรรมที่เอิร์ธอยากทำในวันหยุดคือ?</strong>
+              <p class="mb-0">เฉลย: เดินป่า</p>
+            </div>
+            <div class="list-group-item">
+              <strong>19. กีฬาโปรดของเอิร์ธคืออะไร?</strong>
+              <p class="mb-0">เฉลย: แบดมินตัน</p>
+            </div>
+            <div class="list-group-item">
+              <strong>20. กิจกรรมในตอนเย็นที่เอิร์ธชอบทำคืออะไร?</strong>
+              <p class="mb-0">เฉลย: เล่นเกม</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle พร้อม Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Clippy.js (ถ้ามีใช้งาน) -->
+  <script src="https://unpkg.com/clippyjs@1.0.0/clippy.min.js"></script>
+  <!-- Script สำหรับปุ่มเปิดเพลง -->
+  <script>
+    document.getElementById('btnPlaySong').addEventListener('click', function() {
+      // แสดง modal เพลง
+      var songModal = new bootstrap.Modal(document.getElementById('songModal'));
+      songModal.show();
+      // เล่นเพลง
+      var audio = document.getElementById('songAudio');
+      audio.play();
+    });
+    // เมื่อ modal ถูกปิด ให้อย่หยุดเพลง
+    document.getElementById('songModal').addEventListener('hidden.bs.modal', function () {
+      var audio = document.getElementById('songAudio');
+      audio.pause();
+      audio.currentTime = 0;
+    });
+  </script>
+
+  <!-- Script สำหรับ Love Quiz -->
+  <script>
+    const quizQuestions = [
+      { question: "อาหารที่เอิร์ธชอบที่สุดคืออะไร?", options: ["ส้มตำ", "ซูชิ", "ไม่ใช่สักอย่าง", "ถูกทุกอย่าง"], answer: 3 },
+      { question: "สถานที่ท่องเที่ยวที่เอิร์ธอยากไปที่สุดคือที่ไหน?", options: ["ภูเก็ต", "เชียงใหม่", "กระบี่", "อยู่บ้าน"], answer: 3},
+      { question: "สีที่เอิร์ธชอบที่สุดคืออะไร?", options: ["แดง", "ฟ้า", "เขียว", "ทุกสี"], answer: 3 },
+      { question: "งานอดิเรกที่เอิร์ธชอบคืออะไร?", options: ["ไม่มีที่ชอบเป็นพิเศษ", "ดูหนัง", "เล่นเกม", "ออกกำลังกาย"], answer: 0 },
+      { question: "เพลงประเภทที่เอิร์ธชอบฟังมากที่สุดคืออะไร?", options: ["ป็อป", "ร็อก", "แจ๊ส", "ไม่ฟังเพลง"], answer: 3 },
+      { question: "สัตว์เลี้ยงที่เอิร์ธชอบมากที่สุดคืออะไร?", options: ["สุนัข", "แมว", "นก", "ปลา"], answer: 0 },
+      { question: "เวลาว่างเอิร์ธชอบทำอะไร?", options: ["เขียนโปรแกรม", "อ่านการ์ตูน", "เล่นเกม", "ทำเกม"], answer: 1 },
+      { question: "ฤดูกาลที่เอิร์ธชอบที่สุดคือ?", options: ["ฤดูใบไม้ผลิ", "ฤดูร้อน", "ฤดูใบไม้ร่วง", "ฤดูหนาว"], answer: 3 },
+      { question: "เครื่องดื่มที่เอิร์ธชอบคืออะไร?", options: ["กาแฟ", "ชา", "น้ำผลไม้", "น้ำอัดลม"], answer: 3 },
+      { question: "คาเฟ่ที่เอิร์ธชอบไปบ่อยคือร้านไหน?", options: ["Ai cha", "Cafe Amazon", "ไม่ชอบเลย", "ทุกที่"], answer: 3 },
+      { question: "หนังที่เอิร์ธชื่นชอบมากที่สุดคืออะไร?", options: ["แอ็คชั่น", "โรแมนติก", "คอเมดี้", "สยองขวัญ"], answer: 3 },
+      { question: "วันเกิดของเอิร์ธคือวันไหน?", options: ["20 เมษายน", "14 กุมภาพันธ์", "31 ธันวาคม", "20 ธันวาคม"], answer: 0 },
+      { question: "ขนมหวานที่เอิร์ธชอบคืออะไร?", options: ["เค้ก", "ไอศกรีม", "ช็อกโกแลต", "บราวนี่"], answer: 1 },
+      { question: "นักกีฬาในฝันของเอิร์ธคือใคร?", options: ["ชอบทุกคน", "เมสซี่", "โรนัลโด้", "ไม่ดูบอล"], answer: 3 },
+      { question: "หนังสือที่เอิร์ธชอบอ่านคือประเภทใด?", options: ["นิยายโรแมนติก", "หนังสือเกี่ยวกับการพัฒนาตนเอง", "หนังสือเกี่ยวกับหินและการเจียรนัย", "หนังสือเกี่ยวกับวิทยาศาสตร์"], answer: 3 },
+      { question: "ที่พักชั่วคราวที่เอิร์ธชอบคือแบบไหน?", options: ["โรงแรมหรู", "บ้านพักสบายๆ", "โฮสเทล", "รีสอร์ท"], answer: 0 },
+      { question: "ดอกไม้ที่เอิร์ธชอบมากที่สุดคืออะไร?", options: ["กุหลาบ", "ลิลลี่", "ทิวลิป", "เดซี่"], answer: 0 },
+      { question: "กิจกรรมที่เอิร์ธอยากทำในวันหยุดคือ?", options: ["เดินป่า", "ช้อปปิ้ง", "ดูหนัง", "พักผ่อนที่บ้าน"], answer: 0 },
+      { question: "กีฬาโปรดของเอิร์ธคืออะไร?", options: ["ฟุตบอล", "แบดมินตัน", "วอลเลย์บอล", "หมากฮอส"], answer: 1 },
+      { question: "กิจกรรมในตอนเย็นที่เอิร์ธชอบทำคืออะไร?", options: ["ดูยูทูป", "เล่นเกม", "อ่านหนังสือ", "ออกไปกินข้าว"], answer: 0 }
+    ];
+
+    function generateQuiz() {
+      const quizQuestionsDiv = document.getElementById('quizQuestions');
+      quizQuestions.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.classList.add('mb-4');
+        
+        // สร้างหัวข้อคำถาม
+        const questionTitle = document.createElement('h5');
+        questionTitle.textContent = (index + 1) + '. ' + q.question;
+        questionDiv.appendChild(questionTitle);
+        
+        // สร้างตัวเลือกเป็น radio button
+        q.options.forEach((option, i) => {
+          const optionDiv = document.createElement('div');
+          optionDiv.classList.add('form-check');
+          
+          const input = document.createElement('input');
+          input.classList.add('form-check-input');
+          input.type = 'radio';
+          input.name = 'question' + index;
+          input.id = 'question' + index + 'option' + i;
+          input.value = i;
+          
+          const label = document.createElement('label');
+          label.classList.add('form-check-label');
+          label.htmlFor = input.id;
+          label.textContent = option;
+          
+          optionDiv.appendChild(input);
+          optionDiv.appendChild(label);
+          questionDiv.appendChild(optionDiv);
+        });
+        
+        quizQuestionsDiv.appendChild(questionDiv);
+      });
+    }
+
+    function calculateScore(event) {
+      event.preventDefault();
+      let score = 0;
+      quizQuestions.forEach((q, index) => {
+        const selected = document.querySelector('input[name="question' + index + '"]:checked');
+        if (selected && parseInt(selected.value) === q.answer) {
+          score++;
+        }
+      });
+      const resultDiv = document.getElementById('quizResult');
+      resultDiv.innerHTML = `<h4>คะแนนของคุณ: ${score} / ${quizQuestions.length}</h4>`;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      generateQuiz();
+      document.getElementById('quizForm').addEventListener('submit', calculateScore);
+    });
+  </script>
+
+  <!-- Script สำหรับ Heart Animation Effects -->
+  <script>
+    // ใช้ window.addEventListener ใน capturing phase เพื่อจับ click จากทุกส่วน
+    window.addEventListener('click', function(e) {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.style.left = (e.clientX - 10) + 'px';
+      heart.style.top = (e.clientY - 10) + 'px';
+      heart.textContent = '♥';
+      document.documentElement.appendChild(heart);
+      setTimeout(() => {
+        heart.remove();
+      }, 2000);
+    }, true);
+  </script>
+  
+</body>
+</html>
